@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>凯琳高级账号空间</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+}
+body {
+  background: #0a0e17;
+  color: #e0e6f0;
+  overflow-x: hidden;
+}
+/* 导航栏 */
+nav {
+  position: fixed;
+  width: 100%;
+  padding: 1.2rem 5%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(10,14,23,0.85);
+  backdrop-filter: blur(12px);
+  z-index: 999;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #60a5fa;
+}
+.nav-links a {
+  color: #e0e6f0;
+  text-decoration: none;
+  margin-left: 2rem;
+  font-weight: 500;
+  transition: color 0.3s;
+  cursor: pointer;
+}
+.nav-links a:hover {
+  color: #60a5fa;
+}
+/* 全屏Banner */
+.banner {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 0 5%;
+  background: radial-gradient(circle at center, #1e293b, #0a0e17);
+}
+.banner h1 {
+  font-size: 3.5rem;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(90deg, #60a5fa, #a78bfa);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+.banner p {
+  font-size: 1.2rem;
+  max-width: 700px;
+  opacity: 0.8;
+  margin-bottom: 2rem;
+}
+.btn {
+  padding: 0.9rem 2.2rem;
+  background: linear-gradient(90deg, #2563eb, #7c3aed);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(37,99,235,0.3);
+}
+
+/* 主页新增装饰按钮（好看、非商品、不影响原有） */
+.banner-btn-group {
+  display: flex;
+  gap: 16px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.btn-decor {
+  padding: 0.8rem 1.8rem;
+  background: rgba(30,41,59,0.7);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #fff;
+  border-radius: 50px;
+  font-weight: 600;
+  cursor: default;
+  transition: 0.3s;
+}
+.btn-decor:hover {
+  border-color: #60a5fa;
+  background: rgba(30,41,59,0.9);
+}
+
+/* 你的商品按钮菜单样式（完全不动） */
+.product-menu {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto 6rem;
+  padding: 0 5%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.product-btn {
+  background: rgba(30,41,59,0.6);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #e2e8f0;
+  padding: 16px 20px;
+  border-radius: 14px;
+  text-align: left;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.product-btn:hover {
+  border-color: #60a5fa;
+  background: rgba(30,41,59,0.8);
+  transform: translateX(4px);
+}
+
+/* 卡片区（不动） */
+.section {
+  padding: 7rem 5%;
+}
+.section h2 {
+  font-size: 2.2rem;
+  text-align: center;
+  margin-bottom: 4rem;
+  color: #cbd5e1;
+}
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px,1fr));
+  gap: 2rem;
+}
+.card {
+  background: rgba(30,41,59,0.5);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 2rem;
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+}
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+}
+.card h3 {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  color: #e2e8f0;
+}
+.card p {
+  opacity: 0.75;
+  line-height: 1.7;
+}
+/* 滚动动画（不动） */
+.fade-in {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.fade-in.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 收款弹窗（不动） */
+.pay-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.85);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.pay-modal.active {
+  display: flex;
+}
+.pay-box {
+  background: rgba(20,30,48,0.9);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 35px 30px;
+  max-width: 460px;
+  width: 100%;
+  text-align: center;
+  color: #fff;
+  position: relative;
+}
+.pay-close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 22px;
+  color: #fff;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.pay-title {
+  font-size: 20px;
+  margin-bottom: 18px;
+  color: #60a5fa;
+}
+.pay-price {
+  font-size: 36px;
+  font-weight: bold;
+  color: #10b981;
+  margin-bottom: 10px;
+}
+.pay-warning {
+  background: rgba(245,158,11,0.1);
+  border-left: 4px solid #f59e0b;
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 13px;
+  color: #fcd34d;
+  margin: 14px 0;
+  border-radius: 6px;
+}
+.pay-address {
+  background: #111827;
+  border: 1px dashed #3b82f6;
+  padding: 12px;
+  border-radius: 10px;
+  font-family: monospace;
+  font-size: 13px;
+  color: #3b82f6;
+  word-break: break-all;
+  margin: 10px 0;
+}
+.pay-copy {
+  background: linear-gradient(90deg,#2563eb,#7c3aed);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 30px;
+  cursor: pointer;
+  margin: 10px 0;
+  width: 100%;
+  font-weight: bold;
+}
+.pay-qr {
+  background: #fff;
+  padding: 8px;
+  display: inline-block;
+  border-radius: 10px;
+  margin: 10px 0;
+}
+.pay-info {
+  font-size: 12px;
+  color: #ccc;
+  text-align: left;
+  line-height: 1.6;
+  margin-top: 10px;
+}
+
+/* 联系我们弹窗（不动） */
+.contact-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.9);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.contact-modal.active {
+  display: flex;
+}
+.contact-box {
+  background: rgba(20,30,48,0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 40px 30px;
+  max-width: 500px;
+  width: 100%;
+  color: #fff;
+  position: relative;
+}
+.contact-close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 22px;
+  color: #fff;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.contact-item {
+  margin: 18px 0;
+  font-size: 16px;
+  line-height: 1.6;
+}
+.contact-item strong {
+  color: #60a5fa;
+  display: inline-block;
+  width: 100px;
+}
+
+/* 👇 新增：祝你发财 视频祝福弹窗（高级美观） */
+.lucky-modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.9);
+  z-index: 99999;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.lucky-modal.active {
+  display: flex;
+}
+.lucky-box {
+  background: rgba(22, 28, 46, 0.95);
+  border-radius: 24px;
+  max-width: 500px;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 50px rgba(255,215,0,0.2);
+}
+.lucky-close {
+  position: absolute;
+  top: 12px; right: 16px;
+  background: none; border: 0;
+  color: #fff; font-size: 24px;
+  cursor: pointer; z-index: 2;
+}
+.lucky-video {
+  width: 100%;
+  display: block;
+}
+.lucky-text {
+  padding: 24px;
+  text-align: center;
+}
+.lucky-title {
+  font-size: 28px;
+  background: linear-gradient(90deg, #ffd700, #ffed4b, #ff9800);
+  -webkit-background-clip: text;
+  color: transparent;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+.lucky-desc {
+  color: #ccc;
+  font-size: 15px;
+}
+
+/* 响应式 */
+@media(max-width:768px){
+  .banner h1 {font-size:2.5rem;}
+  .nav-links a {margin-left:1rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- 导航 -->
+<nav>
+  <div class="logo">凯琳账号空间</div>
+  <div class="nav-links">
+    <a href="#home">首页</a>
+    <a href="#products">商品</a>
+    <a href="#service">服务</a>
+    <a onclick="openContact()">联系</a>
+  </div>
+</nav>
+
+<!-- Banner -->
+<section class="banner" id="home">
+  <h1>凯琳高级账号空间</h1>
+  <p>精品账号｜多平台批发｜安全稳定｜售后无忧</p>
+  
+  <!-- 👇 探索按钮绑定：祝你发财视频页 -->
+  <button class="btn" onclick="openLucky()">开始探索</button>
+
+  <!-- 主页新增好看装饰按钮（非商品） -->
+  <div class="banner-btn-group">
+    <div class="btn-decor">✅ 安全担保</div>
+    <div class="btn-decor">⚡ 极速发货</div>
+    <div class="btn-decor">🛡️ 终身售后</div>
+  </div>
+</section>
+
+<!-- 商品区（完全没动！） -->
+<section class="section" id="products">
+  <h2 class="fade-in">🏠 账号商城专区</h2>
+  <div class="product-menu fade-in">
+    <button class="product-btn" onclick="openPay('💬微信账号', 0)">💬微信账号  💰价格咨询</button>
+    <button class="product-btn" onclick="openPay('✈️TG账号', 0)">✈️TG账号  💰价格咨询</button>
+    <button class="product-btn" onclick="openPay('📱多平台账号批发', 0)">📱 多平台账号批发</button>
+    <button class="product-btn" onclick="openPay('TikTok满月白号/老号', 0)">• TikTok 满月白号/老号</button>
+    <button class="product-btn" onclick="openPay('Facebook老号/广告号', 0)">• Facebook 老号/广告号</button>
+    <button class="product-btn" onclick="openPay('腾讯QQ/企业号', 0)">• 腾讯QQ/企业号</button>
+    <button class="product-btn" onclick="openPay('📱海外苹果ID', 0)">📱海外苹果ID</button>
+    <button class="product-btn" onclick="openPay('🎁购物卡核销专区', 0)">🎁 购物卡核销专区</button>
+    <button class="product-btn" onclick="openPay('中国石油油卡1000面值', 0)">• 中国石油油卡1000面值</button>
+    <button class="product-btn" onclick="openPay('🛡️售后保障', 0)">🛡️售后保障</button>
+    <button class="product-btn" onclick="openPay('✅协议号session+json', 0)">✅【协议号】 session+json</button>
+    <button class="product-btn" onclick="openPay('✅靓号 会员代开', 0)">✅ 靓号 会员代开</button>
+    <button class="product-btn" onclick="openPay('✅直登号tdata', 0)">✅【直登号】 tdata</button>
+    <button class="product-btn" onclick="window.open('https://t.me/你的频道','_blank')">🔊【频道】点击进入</button>
+  </div>
+</section>
+
+<!-- 功能卡片（不动） -->
+<section class="section" id="service">
+  <h2 class="fade-in">核心服务</h2>
+  <div class="cards">
+    <div class="card fade-in" onclick="openPay('高性能账号服务', 200)">
+      <h3>高性能</h3>
+      <p>账号稳定不封，设备纯净，安全可靠</p>
+    </div>
+    <div class="card fade-in" onclick="openPay('全程一对一服务', 180)">
+      <h3>一对一服务</h3>
+      <p>全程指导，包教包会，售后永久维护</p>
+    </div>
+    <div class="card fade-in" onclick="openPay('高级安全保障', 260)">
+      <h3>安全保障</h3>
+      <p>隐私保护，资金安全，售后无忧</p>
+    </div>
+  </div>
+</section>
+
+<!-- 收款弹窗（不动） -->
+<div class="pay-modal" id="payModal">
+  <div class="pay-box">
+    <button class="pay-close" onclick="closePay()">×</button>
+    <div class="pay-title" id="payTitle">商品名称</div>
+    <div class="pay-price" id="payPrice">价格咨询 USDT</div>
+
+    <div class="pay-warning">
+      ⚠️ 仅支持 USDT-TRC20 付款，转错链资产无法找回
+    </div>
+
+    <div class="pay-address" id="payAddress">TRXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</div>
+    <button class="pay-copy" onclick="copyAddress()">复制收款地址</button>
+
+    <div class="pay-qr" id="payQrcode"></div>
+
+    <div class="pay-info">
+      1. 复制地址或扫码转账<br>
+      2. 完成后联系客服 TG: @Kaelin_007<br>
+      3. 核对后10分钟内发货
+    </div>
+  </div>
+</div>
+
+<!-- 联系我们弹窗（不动） -->
+<div class="contact-modal" id="contactModal">
+  <div class="contact-box">
+    <button class="contact-close" onclick="closeContact()">×</button>
+    <h2 style="text-align:center; margin-bottom:30px; color:#60a5fa;">📞 联系我们</h2>
+    
+    <div class="contact-item">
+      <strong>TG客服：</strong> @Kaelin_007
+    </div>
+    <div class="contact-item">
+      <strong>联系电话：</strong> 400-888-9999
+    </div>
+    <div class="contact-item">
+      <strong>公司地址：</strong> 北京市朝阳区科技园区88号
+    </div>
+    <div class="contact-item">
+      <strong>服务时间：</strong> 7×24小时 全天候在线
+    </div>
+    <div class="contact-item">
+      <strong>服务承诺：</strong> 安全担保 | 极速发货 | 终身售后
+    </div>
+  </div>
+</div>
+
+<!-- 👇 新增：祝你发财 视频弹窗 -->
+<div class="lucky-modal" id="luckyModal">
+  <div class="lucky-box">
+    <button class="lucky-close" onclick="closeLucky()">×</button>
+    <!-- 网络发财视频（自动播放、静音循环） -->
+    <video class="lucky-video" autoplay muted loop playsinline>
+      <source src="https://cdn.pixabay.com/videos/id/46828/1080p.mp4" type="video/mp4">
+    </video>
+    <div class="lucky-text">
+      <div class="lucky-title">💰 祝你发财 · 万事顺意</div>
+      <div class="lucky-desc">生意兴隆 · 财源广进 · 平安喜乐</div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script>
+// 滚动动画
+const fadeElements = document.querySelectorAll('.fade-in');
+function checkFade() {
+  fadeElements.forEach(el => {
+    const top = el.getBoundingClientRect().top;
+    if (top < window.innerHeight * 0.85) {
+      el.classList.add('show');
+    }
+  });
+}
+window.addEventListener('scroll', checkFade);
+window.addEventListener('load', checkFade);
+
+// --------------------------
+// 收款配置（不改）
+// --------------------------
+const USDT_ADDR = "TRX8dG5eL7mK2pN9sR4wA1vB6cY3tH0jFq";
+const TG_CONTACT = "@Kaelin_007";
+
+// 打开收款
+function openPay(title, price) {
+  document.getElementById("payTitle").innerText = title;
+  if(price == 0){
+    document.getElementById("payPrice").innerText = "价格咨询";
+  }else{
+    document.getElementById("payPrice").innerText = price + " USDT";
+  }
+  document.getElementById("payAddress").innerText = USDT_ADDR;
+
+  const qrBox = document.getElementById("payQrcode");
+  qrBox.innerHTML = "";
+  new QRCode(qrBox, {
+    text: USDT_ADDR,
+    width: 130,
+    height: 130
+  });
+
+  document.getElementById("payModal").classList.add("active");
+}
+function closePay() {
+  document.getElementById("payModal").classList.remove("active");
+}
+function copyAddress() {
+  navigator.clipboard.writeText(USDT_ADDR).then(() => {
+    alert("✅ 地址已复制");
+  });
+}
+
+// --------------------------
+// 联系弹窗
+// --------------------------
+function openContact() {
+  document.getElementById("contactModal").classList.add("active");
+}
+function closeContact() {
+  document.getElementById("contactModal").classList.remove("active");
+}
+
+// --------------------------
+// 👇 新增：祝你发财弹窗
+// --------------------------
+function openLucky(){
+  document.getElementById("luckyModal").classList.add("active");
+}
+function closeLucky(){
+  document.getElementById("luckyModal").classList.remove("active");
+}
+</script>
+</body>
+</html>
