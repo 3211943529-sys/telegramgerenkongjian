@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <!-- 适配手机（必须！Telegram 里必须有这行） -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的迷你小空间</title>
+
+    <!-- 1. CSS：写样式（颜色、字体、按钮） -->
+    <style>
+        /* 整个页面样式 */
+        body {
+            background-color: #f0f8ff; /* 浅蓝色背景 */
+            font-family: 微软雅黑, sans-serif; /* 字体 */
+            text-align: center; /* 所有内容居中 */
+            padding: 30px; /* 四周留白 */
+            margin: 0;
+        }
+
+        /* 大标题样式 */
+        h1 {
+            color: #228b22; /* 深绿色 */
+            font-size: 28px;
+        }
+
+        /* 文字段落样式 */
+        p {
+            font-size: 18px;
+            color: #333;
+        }
+
+        /* 按钮样式（重点！） */
+        button {
+            background-color: #0088cc; /* 蓝色按钮 */
+            color: white; /* 白字 */
+            font-size: 18px;
+            padding: 12px 30px; /* 按钮大小 */
+            border: none; /* 去掉边框 */
+            border-radius: 8px; /* 圆角 */
+            cursor: pointer; /* 鼠标变手 */
+            margin: 10px; /* 按钮之间距离 */
+        }
+
+        /* 按钮按下去变深一点 */
+        button:active {
+            background-color: #006699;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 2. HTML：页面内容（标题、文字、按钮） -->
+    <h1>🌟 欢迎来到我的迷你小空间</h1>
+    <p id="userText">正在加载你的信息...</p>
+
+    <!-- 两个按钮 -->
+    <button onclick="sayHello()">点我打招呼</button>
+    <button onclick="closeTelegram()">关闭小空间</button>
+
+    <!-- 3. JS：逻辑（和 Telegram 互动、按钮动作） -->
+    <!-- 必须引入 Telegram 官方SDK，不然不能互动 -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <script>
+        // 初始化 Telegram 迷你应用
+        const tg = window.Telegram.WebApp;
+        tg.ready(); // 告诉 Telegram：我准备好了
+        tg.expand(); // 自动全屏（好看）
+
+        // 获取打开小空间的用户信息
+        const user = tg.initDataUnsafe?.user;
+        if (user) {
+            document.getElementById("userText").innerText = 
+                `你好！${user.first_name}，你的ID：${user.id}`;
+        }
+
+        // 按钮1：打招呼
+        function sayHello() {
+            alert("哈喽！很高兴见到你 😊");
+        }
+
+        // 按钮2：关闭迷你应用（回到聊天）
+        function closeTelegram() {
+            tg.close();
+        }
+    </script>
+</body>
+</html>
